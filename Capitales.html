@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apprends les Capitales !</title>
+    <style>
+        /* Styles CSS pour l'apparence */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alignement en haut pour laisser de la place */
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        #app-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2.2em;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+        }
+
+        /* Menu Principal */
+        #main-menu div {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        #main-menu h3 {
+            color: #2980b9;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+        }
+
+        .region-button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            margin: 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .region-button.continent-button {
+            background-color: #e67e22; /* Couleur différente pour les continents */
+        }
+
+        .region-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .region-button.continent-button:hover {
+            background-color: #d35400;
+        }
+
+        .region-button:active {
+            background-color: #2471a3;
+            transform: translateY(0);
+        }
+
+        .region-button.continent-button:active {
+            background-color: #bf4000;
+        }
+
+
+        /* Flashcard */
+        #flashcard-container {
+            display: none; /* Caché par défaut */
+            margin-top: 30px;
+        }
+
+        #flashcard {
+            background-color: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 10px;
+            padding: 40px 20px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.4s ease;
+            transform-style: preserve-3d;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .flashcard-inner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-flipped #flashcard-front {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-flipped #flashcard-back {
+            transform: rotateY(0deg);
+        }
+
+        #flashcard-front, #flashcard-back {
+            transition: transform 0.4s ease;
+        }
+
+        #flashcard-text {
+            word-wrap: break-word; /* Gère les longs noms */
+            text-align: center;
+        }
+
+        #controls button {
+            background-color: #1abc9c;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 0 10px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        #controls button:hover {
+            background-color: #16a085;
+        }
+
+        #back-to-menu {
+            background-color: #e74c3c;
+            margin-top: 20px;
+        }
+
+        #back-to-menu:hover {
+            background-color: #c0392b;
+        }
+
+        /* Message de fin */
+        #completion-message {
+            display: none;
+            font-size: 1.4em;
+            color: #27ae60;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            #app-container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h2 {
+                font-size: 1.4em;
+            }
+            .region-button {
+                width: 100%;
+                margin: 6px 0;
+            }
+            #flashcard {
+                font-size: 1.4em;
+                padding: 30px 15px;
+            }
+            #controls button {
+                padding: 10px 18px;
+                font-size: 1em;
+                margin: 0 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <div id="main-menu">
+            <h1>Apprends les Capitales du Monde !</h1>
+            <p>Sélectionnez un continent ou une sous-région pour commencer :</p>
+
+            <div>
+                <h3>Afrique</h3>
+                <button class="region-button continent-button" data-region="Afrique">Afrique (total)</button>
+                <button class="region-button" data-region="Afrique du Nord">Afrique du Nord (7)</button>
+                <button class="region-button" data-region="Afrique de l'Ouest">Afrique de l'Ouest (16)</button>
+                <button class="region-button" data-region="Afrique Centrale">Afrique Centrale (9)</button>
+                <button class="region-button" data-region="Afrique de l'Est">Afrique de l'Est (16)</button>
+                <button class="region-button" data-region="Afrique Australe">Afrique Australe (7)</button>
+            </div>
+
+            <div>
+                <h3>Amérique</h3>
+                <button class="region-button continent-button" data-region="Amérique">Amérique (total)</button>
+                <button class="region-button" data-region="Amérique du Nord">Amérique du Nord (3)</button>
+                <button class="region-button" data-region="Caraïbes">Caraïbes (13)</button>
+                <button class="region-button" data-region="Amérique Centrale">Amérique Centrale (7)</button>
+                <button class="region-button" data-region="Amérique du Sud">Amérique du Sud (12)</button>
+            </div>
+
+            <div>
+                <h3>Asie</h3>
+                <button class="region-button continent-button" data-region="Asie">Asie (total)</button>
+                <button class="region-button" data-region="Asie Centrale">Asie Centrale (5)</button>
+                <button class="region-button" data-region="Asie de l'Est">Asie de l'Est (5)</button>
+                <button class="region-button" data-region="Asie du Sud">Asie du Sud (8)</button>
+                <button class="region-button" data-region="Asie du Sud-Est">Asie du Sud-Est (11)</button>
+                <button class="region-button" data-region="Asie de l'Ouest (Moyen-Orient)">Asie de l'Ouest (Moyen-Orient) (18)</button>
+            </div>
+
+            <div>
+                <h3>Europe</h3>
+                <button class="region-button continent-button" data-region="Europe">Europe (total)</button>
+                <button class="region-button" data-region="Europe de l'Ouest">Europe de l'Ouest (11)</button>
+                <button class="region-button" data-region="Europe du Nord">Europe du Nord (8)</button>
+                <button class="region-button" data-region="Europe du Sud">Europe du Sud (16)</button>
+                <button class="region-button" data-region="Europe de l'Est">Europe de l'Est (10)</button>
+            </div>
+
+            <div>
+                <h3>Océanie</h3>
+                <button class="region-button continent-button" data-region="Océanie">Océanie (total)</button>
+                <button class="region-button" data-region="Australasie et Mélanésie">Australasie et Mélanésie (6)</button>
+                <button class="region-button" data-region="Micronésie">Micronésie (5)</button>
+                <button class="region-button" data-region="Polynésie">Polynésie (3)</button>
+            </div>
+
+             <h2>Ou tous les pays :</h2>
+            <button class="region-button" data-region="Tous les pays">Tous les pays (197)</button>
+
+        </div>
+
+        <div id="flashcard-container">
+            <h2 id="current-region-title"></h2>
+            <div id="flashcard" class="flashcard-front">
+                <div id="flashcard-front" class="flashcard-inner">
+                    <span id="flashcard-text"></span>
+                </div>
+                <div id="flashcard-back" class="flashcard-inner flashcard-back">
+                    <span id="flashcard-capital-text"></span>
+                </div>
+            </div>
+            <p id="progress-text"></p>
+            <div id="controls">
+                <button id="next-button">Pays Suivant</button>
+            </div>
+            <p id="completion-message">Bravo, vous avez parcouru tous les pays de cette région !</p>
+            <button id="back-to-menu">Retour au Menu Principal</button>
+        </div>
+    </div>
+
+    <script>
+        // Données des pays et capitales (modèle légèrement simplifié pour les capitales multiples)
+        const countriesData = {
+            "Afrique du Nord": [
+                { country: "Algérie", capital: "Alger" },
+                { country: "Égypte", capital: "Le Caire" },
+                { country: "Libye", capital: "Tripoli" },
+                { country: "Maroc", capital: "Rabat" },
+                { country: "Mauritanie", capital: "Nouakchott" },
+                { country: "Soudan", capital: "Khartoum" },
+                { country: "Tunisie", capital: "Tunis" }
+            ],
+            "Afrique de l'Ouest": [
+                { country: "Bénin", capital: "Porto-Novo" },
+                { country: "Burkina Faso", capital: "Ouagadougou" },
+                { country: "Cap-Vert", capital: "Praia" },
+                { country: "Côte d'Ivoire", capital: "Yamoussoukro" },
+                { country: "Gambie", capital: "Banjul" },
+                { country: "Ghana", capital: "Accra" },
+                { country: "Guinée", capital: "Conakry" },
+                { country: "Guinée-Bissau", capital: "Bissau" },
+                { country: "Liberia", capital: "Monrovia" },
+                { country: "Mali", capital: "Bamako" },
+                { country: "Niger", capital: "Niamey" },
+                { country: "Nigeria", capital: "Abuja" },
+                { country: "Sénégal", capital: "Dakar" },
+                { country: "Sierra Leone", capital: "Freetown" },
+                { country: "Togo", capital: "Lomé" }
+            ],
+            "Afrique Centrale": [
+                { country: "Angola", capital: "Luanda" },
+                { country: "Cameroun", capital: "Yaoundé" },
+                { country: "République centrafricaine", capital: "Bangui" },
+                { country: "Tchad", capital: "N'Djamena" },
+                { country: "Congo (Rép. du Congo)", capital: "Brazzaville" },
+                { country: "RD Congo (Rép. dém. du Congo)", capital: "Kinshasa" },
+                { country: "Guinée équatoriale", capital: "Malabo" },
+                { country: "Gabon", capital: "Libreville" },
+                { country: "Sao Tomé-et-Principe", capital: "São Tomé" }
+            ],
+            "Afrique de l'Est": [
+                { country: "Burundi", capital: "Gitega" },
+                { country: "Comores", capital: "Moroni" },
+                { country: "Djibouti", capital: "Djibouti" },
+                { country: "Érythrée", capital: "Asmara" },
+                { country: "Éthiopie", capital: "Addis-Abeba" },
+                { country: "Kenya", capital: "Nairobi" },
+                { country: "Madagascar", capital: "Antananarivo" },
+                { country: "Malawi", capital: "Lilongwe" },
+                { country: "Maurice", capital: "Port-Louis" },
+                { country: "Mozambique", capital: "Maputo" },
+                { country: "Rwanda", capital: "Kigali" },
+                { country: "Seychelles", capital: "Victoria" },
+                { country: "Somalie", capital: "Mogadiscio" },
+                { country: "Soudan du Sud", capital: "Djouba" },
+                { country: "Tanzanie", capital: "Dodoma" },
+                { country: "Ouganda", capital: "Kampala" }
+            ],
+            "Afrique Australe": [
+                { country: "Afrique du Sud", capital: "Pretoria" },
+                { country: "Botswana", capital: "Gaborone" },
+                { country: "Eswatini (Swaziland)", capital: "Mbabane" },
+                { country: "Lesotho", capital: "Maseru" },
+                { country: "Namibie", capital: "Windhoek" },
+                { country: "Zambie", capital: "Lusaka" },
+                { country: "Zimbabwe", capital: "Harare" }
+            ],
+            "Amérique du Nord": [
+                { country: "Canada", capital: "Ottawa" },
+                { country: "États-Unis", capital: "Washington D.C." },
+                { country: "Mexique", capital: "Mexico" }
+            ],
+            "Caraïbes": [
+                { country: "Antigua-et-Barbuda", capital: "Saint John's" },
+                { country: "Bahamas", capital: "Nassau" },
+                { country: "Barbade", capital: "Bridgetown" },
+                { country: "Cuba", capital: "La Havane" },
+                { country: "Dominique", capital: "Roseau" },
+                { country: "Grenade", capital: "Saint-George's" },
+                { country: "Haïti", capital: "Port-au-Prince" },
+                { country: "Jamaïque", capital: "Kingston" },
+                { country: "République dominicaine", capital: "Saint-Domingue" },
+                { country: "Saint-Christophe-et-Niévès", capital: "Basseterre" },
+                { country: "Sainte-Lucie", capital: "Castries" },
+                { country: "Saint-Vincent-et-les-Grenadines", capital: "Kingstown" },
+                { country: "Trinité-et-Tobago", capital: "Port-d'Espagne" }
+            ],
+            "Amérique Centrale": [
+                { country: "Belize", capital: "Belmopan" },
+                { country: "Costa Rica", capital: "San José" },
+                { country: "El Salvador", capital: "San Salvador" },
+                { country: "Guatemala", capital: "Guatemala" },
+                { country: "Honduras", capital: "Tegucigalpa" },
+                { country: "Nicaragua", capital: "Managua" },
+                { country: "Panama", capital: "Panama" }
+            ],
+            "Amérique du Sud": [
+                { country: "Argentine", capital: "Buenos Aires" },
+                { country: "Bolivie", capital: "Sucre" },
+                { country: "Brésil", capital: "Brasília" },
+                { country: "Chili", capital: "Santiago" },
+                { country: "Colombie", capital: "Bogota" },
+                { country: "Équateur", capital: "Quito" },
+                { country: "Guyana", capital: "Georgetown" },
+                { country: "Paraguay", capital: "Asunción" },
+                { country: "Pérou", capital: "Lima" },
+                { country: "Suriname", capital: "Paramaribo" },
+                { country: "Uruguay", capital: "Montevideo" },
+                { country: "Venezuela", capital: "Caracas" }
+            ],
+            "Asie Centrale": [
+                { country: "Kazakhstan", capital: "Astana" },
+                { country: "Kirghizistan", capital: "Bichkek" },
+                { country: "Ouzbékistan", capital: "Tachkent" },
+                { country: "Tadjikistan", capital: "Douchanbé" },
+                { country: "Turkménistan", capital: "Achgabat" }
+            ],
+            "Asie de l'Est": [
+                { country: "Chine", capital: "Pékin" },
+                { country: "Corée du Nord", capital: "Pyongyang" },
+                { country: "Corée du Sud", capital: "Séoul" },
+                { country: "Japon", capital: "Tokyo" },
+                { country: "Mongolie", capital: "Oulan-Bator" }
+            ],
+            "Asie du Sud": [
+                { country: "Afghanistan", capital: "Kaboul" },
+                { country: "Bangladesh", capital: "Dacca" },
+                { country: "Bhoutan", capital: "Thimphou" },
+                { country: "Inde", capital: "New Delhi" },
+                { country: "Maldives", capital: "Malé" },
+                { country: "Népal", capital: "Katmandou" },
+                { country: "Pakistan", capital: "Islamabad" },
+                { country: "Sri Lanka", capital: "Sri Jayawardenepura Kotte" }
+            ],
+            "Asie du Sud-Est": [
+                { country: "Birmanie (Myanmar)", capital: "Naypyidaw" },
+                { country: "Brunei", capital: "Bandar Seri Begawan" },
+                { country: "Cambodge", capital: "Phnom Penh" },
+                { country: "Indonésie", capital: "Jakarta" },
+                { country: "Laos", capital: "Vientiane" },
+                { country: "Malaisie", capital: "Kuala Lumpur" },
+                { country: "Philippines", capital: "Manille" },
+                { country: "Singapour", capital: "Singapour" },
+                { country: "Thaïlande", capital: "Bangkok" },
+                { country: "Timor oriental", capital: "Dili" },
+                { country: "Vietnam", capital: "Hanoï" }
+            ],
+            "Asie de l'Ouest (Moyen-Orient)": [
+                { country: "Arabie saoudite", capital: "Riyad" },
+                { country: "Arménie", capital: "Erevan" },
+                { country: "Azerbaïdjan", capital: "Bakou" },
+                { country: "Bahreïn", capital: "Manama" },
+                { country: "Chypre", capital: "Nicosie" },
+                { country: "Émirats arabes unis", capital: "Abu Dhabi" },
+                { country: "Géorgie", capital: "Tbilissi" },
+                { country: "Irak", capital: "Bagdad" },
+                { country: "Iran", capital: "Téhéran" },
+                { country: "Israël", capital: "Jérusalem" },
+                { country: "Jordanie", capital: "Amman" },
+                { country: "Koweït", capital: "Koweït" },
+                { country: "Liban", capital: "Beyrouth" },
+                { country: "Oman", capital: "Mascate" },
+                { country: "Palestine", capital: "Ramallah" },
+                { country: "Qatar", capital: "Doha" },
+                { country: "Syrie", capital: "Damas" },
+                { country: "Turquie", capital: "Ankara" },
+                { country: "Yémen", capital: "Sanaa" }
+            ],
+            "Europe de l'Ouest": [
+                { country: "Allemagne", capital: "Berlin" },
+                { country: "Autriche", capital: "Vienne" },
+                { country: "Belgique", capital: "Bruxelles" },
+                { country: "France", capital: "Paris" },
+                { country: "Irlande", capital: "Dublin" },
+                { country: "Liechtenstein", capital: "Vaduz" },
+                { country: "Luxembourg", capital: "Luxembourg" },
+                { country: "Monaco", capital: "Monaco" },
+                { country: "Pays-Bas", capital: "Amsterdam" },
+                { country: "Royaume-Uni", capital: "Londres" },
+                { country: "Suisse", capital: "Berne" }
+            ],
+            "Europe du Nord": [
+                { country: "Danemark", capital: "Copenhague" },
+                { country: "Estonie", capital: "Tallinn" },
+                { country: "Finlande", capital: "Helsinki" },
+                { country: "Islande", capital: "Reykjavik" },
+                { country: "Lettonie", capital: "Riga" },
+                { country: "Lituanie", capital: "Vilnius" },
+                { country: "Norvège", capital: "Oslo" },
+                { country: "Suède", capital: "Stockholm" }
+            ],
+            "Europe du Sud": [
+                { country: "Albanie", capital: "Tirana" },
+                { country: "Andorre", capital: "Andorre-la-Vieille" },
+                { country: "Bosnie-Herzégovine", capital: "Sarajevo" },
+                { country: "Croatie", capital: "Zagreb" },
+                { country: "Espagne", capital: "Madrid" },
+                { country: "Grèce", capital: "Athènes" },
+                { country: "Italie", capital: "Rome" },
+                { country: "Kosovo", capital: "Pristina" },
+                { country: "Malte", capital: "La Valette" },
+                { country: "Monténégro", capital: "Podgorica" },
+                { country: "Macédoine du Nord", capital: "Skopje" },
+                { country: "Portugal", capital: "Lisbonne" },
+                { country: "Saint-Marin", capital: "Saint-Marin" },
+                { country: "Serbie", capital: "Belgrade" },
+                { country: "Slovénie", capital: "Ljubljana" },
+                { country: "Vatican", capital: "Cité du Vatican" }
+            ],
+            "Europe de l'East": [ // Correction de la faute de frappe "l'Est"
+                { country: "Biélorussie", capital: "Minsk" },
+                { country: "Bulgarie", capital: "Sofia" },
+                { country: "Hongrie", capital: "Budapest" },
+                { country: "Moldavie", capital: "Chișinău" },
+                { country: "Pologne", capital: "Varsovie" },
+                { country: "République tchèque", capital: "Prague" },
+                { country: "Roumanie", capital: "Bucarest" },
+                { country: "Russie", capital: "Moscou" },
+                { country: "Slovaquie", capital: "Bratislava" },
+                { country: "Ukraine", capital: "Kiev" }
+            ],
+            "Australasie et Mélanésie": [
+                { country: "Australie", capital: "Canberra" },
+                { country: "Fidji", capital: "Suva" },
+                { country: "Îles Salomon", capital: "Honiara" },
+                { country: "Nouvelle-Zélande", capital: "Wellington" },
+                { country: "Papouasie-Nouvelle-Guinée", capital: "Port Moresby" },
+                { country: "Vanuatu", capital: "Port-Vila" }
+            ],
+            "Micronésie": [
+                { country: "États fédérés de Micronésie", capital: "Palikir" },
+                { country: "Kiribati", capital: "Tarawa-Sud" },
+                { country: "Îles Marshall", capital: "Majuro" },
+                { country: "Nauru", capital: "Yaren" },
+                { country: "Palaos", capital: "Ngerulmud" }
+            ],
+            "Polynésie": [
+                { country: "Samoa", capital: "Apia" },
+                { country: "Tonga", capital: "Nuku'alofa" },
+                { country: "Tuvalu", capital: "Funafuti" }
+            ]
+        };
+
+        // Ajout des données pour les continents en regroupant les sous-régions
+        countriesData["Afrique"] = [].concat(
+            countriesData["Afrique du Nord"],
+            countriesData["Afrique de l'Ouest"],
+            countriesData["Afrique Centrale"],
+            countriesData["Afrique de l'Est"],
+            countriesData["Afrique Australe"]
+        );
+
+        countriesData["Amérique"] = [].concat(
+            countriesData["Amérique du Nord"],
+            countriesData["Caraïbes"],
+            countriesData["Amérique Centrale"],
+            countriesData["Amérique du Sud"]
+        );
+
+        countriesData["Asie"] = [].concat(
+            countriesData["Asie Centrale"],
+            countriesData["Asie de l'Est"],
+            countriesData["Asie du Sud"],
+            countriesData["Asie du Sud-Est"],
+            countriesData["Asie de l'Ouest (Moyen-Orient)"]
+        );
+
+        countriesData["Europe"] = [].concat(
+            countriesData["Europe de l'Ouest"],
+            countriesData["Europe du Nord"],
+            countriesData["Europe du Sud"],
+            countriesData["Europe de l'East"] // Correction de la faute de frappe
+        );
+
+        countriesData["Océanie"] = [].concat(
+            countriesData["Australasie et Mélanésie"],
+            countriesData["Micronésie"],
+            countriesData["Polynésie"]
+        );
+
+        // Fonction pour obtenir tous les pays dans une seule liste (pour "Tous les pays")
+        function getAllCountries() {
+            let all = [];
+            for (const region in countriesData) {
+                // Évite d'ajouter les continents eux-mêmes si on n'a pas besoin de les lister deux fois
+                if (!['Afrique', 'Amérique', 'Asie', 'Europe', 'Océanie', 'Tous les pays'].includes(region)) {
+                     all = all.concat(countriesData[region]);
+                }
+            }
+            return all;
+        }
+        countriesData["Tous les pays"] = getAllCountries();
+
+
+        const mainMenu = document.getElementById('main-menu');
+        const flashcardContainer = document.getElementById('flashcard-container');
+        const currentRegionTitle = document.getElementById('current-region-title');
+        const flashcard = document.getElementById('flashcard');
+        const flashcardText = document.getElementById('flashcard-text');
+        const flashcardCapitalText = document.getElementById('flashcard-capital-text');
+        const progressText = document.getElementById('progress-text');
+        const nextButton = document.getElementById('next-button');
+        const backToMenuButton = document.getElementById('back-to-menu');
+        const completionMessage = document.getElementById('completion-message');
+
+        let currentCountries = [];
+        let currentIndex = 0;
+        let isFlipped = false;
+
+        // Fonction pour mélanger un tableau (algorithme de Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Met à jour le texte de la flashcard
+        function updateFlashcard() {
+            if (currentIndex < currentCountries.length) {
+                const country = currentCountries[currentIndex];
+                flashcardText.textContent = country.country;
+                flashcardCapitalText.textContent = country.capital;
+                progressText.textContent = `Pays ${currentIndex + 1} / ${currentCountries.length}`;
+                flashcard.classList.remove('flashcard-flipped');
+                isFlipped = false;
+                completionMessage.style.display = 'none'; // Cacher le message de fin
+                flashcard.style.display = 'flex'; // Afficher la flashcard
+                nextButton.style.display = 'inline-block'; // Afficher le bouton suivant
+            } else {
+                // Tous les pays ont été parcourus
+                flashcard.style.display = 'none'; // Cacher la flashcard
+                nextButton.style.display = 'none'; // Cacher le bouton suivant
+                completionMessage.style.display = 'block'; // Afficher le message de fin
+                progressText.textContent = '';
+            }
+        }
+
+        // Gère le clic sur la flashcard
+        flashcard.addEventListener('click', () => {
+            if (!isFlipped) {
+                flashcard.classList.add('flashcard-flipped');
+                isFlipped = true;
+            } else {
+                // Si la carte est déjà retournée, passe au pays suivant
+                currentIndex++;
+                updateFlashcard();
+            }
+        });
+
+        // Gère le clic sur le bouton "Pays Suivant"
+        nextButton.addEventListener('click', () => {
+            currentIndex++;
+            updateFlashcard();
+        });
+
+        // Gère le clic sur les boutons de région
+        document.querySelectorAll('.region-button').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const region = event.target.dataset.region;
+                currentCountries = shuffleArray([...countriesData[region]]); // Copie et mélange les pays
+                currentIndex = 0;
+                currentRegionTitle.textContent = region;
+                mainMenu.style.display = 'none';
+                flashcardContainer.style.display = 'block';
+                updateFlashcard();
+            });
+        });
+
+        // Gère le retour au menu principal
+        backToMenuButton.addEventListener('click', () => {
+            mainMenu.style.display = 'block';
+            flashcardContainer.style.display = 'none';
+            completionMessage.style.display = 'none';
+        });
+
+        // Initialiser les nombres de pays sur les boutons (pour la petite parenthèse)
+        // et mettre à jour le texte des boutons continents
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.region-button').forEach(button => {
+                const regionName = button.dataset.region;
+                if (countriesData[regionName]) {
+                    const count = countriesData[regionName].length;
+                    // Mise à jour du texte pour les continents
+                    if (button.classList.contains('continent-button') || regionName === "Tous les pays") {
+                        button.textContent = `${regionName} (${count})`;
+                    } else {
+                        // Les sous-régions ont déjà leur nombre dans le HTML, pas besoin de le recalculer
+                    }
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
